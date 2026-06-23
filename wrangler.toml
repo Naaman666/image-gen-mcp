@@ -1,0 +1,8 @@
+name = "image-gen-mcp"
+main = "src/worker.ts"
+compatibility_date = "2026-05-20"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[ai]
+binding = "AI"
