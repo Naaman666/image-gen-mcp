@@ -6,3 +6,7 @@ workers_dev = true
 
 [ai]
 binding = "AI"
+
+[[kv_namespaces]]
+binding = "IMAGES"
+id = "8bb79983ec9b468eae52ceaa27ba3cae"
