@@ -77,8 +77,8 @@ async function handleMcp(request: Request, env: Env): Promise<Response> {
         .min(1)
         .max(8)
         .optional()
-        .default(4)
-        .describe("Diffusion steps (1–8). Higher = better quality but slower. Default: 4"),
+        .default(8)
+        .describe("Diffusion steps (1–8). Higher = better quality but slower. Default: 8"),
     },
     async ({ prompt, steps }) => {
       const result = await env.AI.run("@cf/black-forest-labs/flux-1-schnell", { prompt, steps });
