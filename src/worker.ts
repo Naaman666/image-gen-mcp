@@ -100,7 +100,7 @@ async function generateCf(
 
 async function generateHf(env: Env, prompt: string): Promise<Uint8Array> {
   if (!env.HUGGINGFACE_API_KEY) throw new Error("HUGGINGFACE_API_KEY not configured");
-  const resp = await fetch("https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev", {
+  const resp = await fetch("https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${env.HUGGINGFACE_API_KEY}`,
@@ -175,7 +175,7 @@ async function handleMcp(request: Request, env: Env): Promise<Response> {
     [
       "Generate an image from a text prompt.",
       "Models: cf-flux-schnell (fast JPEG, default), cf-sdxl (Stable Diffusion XL, PNG),",
-      "cf-dreamshaper (artistic/portrait, PNG), hf-flux-dev (highest quality FLUX.1-dev via HuggingFace, JPEG).",
+      "cf-dreamshaper (artistic/portrait, PNG), hf-flux-dev (FLUX.1-schnell via HuggingFace router, JPEG — different infra than CF).",
       "Returns a browser-openable URL valid for 1 hour.",
     ].join(" "),
     {
@@ -213,7 +213,7 @@ async function handleMcp(request: Request, env: Env): Promise<Response> {
         "cf-flux-schnell": "Cloudflare Flux Schnell",
         "cf-sdxl": "Cloudflare SDXL",
         "cf-dreamshaper": "Cloudflare DreamShaper",
-        "hf-flux-dev": "HuggingFace FLUX.1-dev",
+        "hf-flux-dev": "HuggingFace FLUX.1-schnell",
       };
 
       return {
