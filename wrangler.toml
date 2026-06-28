@@ -4,6 +4,12 @@ compatibility_date = "2026-05-20"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true
 
+# Workers Logs — so a future request loop is diagnosable live (request path,
+# headers, error) instead of being invisible. Observability had been off, which
+# is why the runaway loop could not be attributed without dashboard archaeology.
+[observability]
+enabled = true
+
 [ai]
 binding = "AI"
 
