@@ -232,7 +232,27 @@ async function handleMcp(request: Request, env: Env): Promise<Response> {
     },
   );
 
-  const transport = new WebStandardStreamableHTTPServerTransport();
+  // enableJsonResponse: return a plain JSON request/response instead of opening an
+  // SSE stream. This server is stateless (no sessionIdGenerator), exposes a single
+  // synchronous tool, and emits no server-initiated notifications, so SSE adds
+  // nothing. A per-request stateless SSE stream made clients reconnect in a tight
+  // loop (~2.7 req/s, 100% errored) — the runaway that exhausted the Cloudflare
+  // free-plan daily request limit. JSON responses complete and close cleanly.
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    enableJsonResponse: true,
+  });
   await server.connect(transport);
-  return transport.handleRequest(request);
+
+  try {
+    return await transport.handleRequest(request);
+  } catch (err) {
+    // Never let a transport/parse throw surface as an uncaught 500: a 5xx makes
+    // MCP clients retry aggressively, which is what amplified the loop. Return a
+    // well-formed JSON-RPC error (HTTP 200) so the client fails gracefully instead.
+    const message = err instanceof Error ? err.message : "internal error";
+    return new Response(
+      JSON.stringify({ jsonrpc: "2.0", error: { code: -32603, message }, id: null }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  }
 }
