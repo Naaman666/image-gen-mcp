@@ -167,6 +167,19 @@ async function handleMcp(request: Request, env: Env): Promise<Response> {
     }
   }
 
+  // Stateless JSON-only MCP (enableJsonResponse, no sessionIdGenerator): this server
+  // opens no GET SSE stream for server→client notifications. Passing a GET to
+  // transport.handleRequest makes the Worker hang (the runtime cancels the request →
+  // the MCP client retries in a tight loop — the second half of the #2 runaway that
+  // the enableJsonResponse fix alone did not close). Reject GET with 405 so the client
+  // learns there is no server-initiated stream and stops retrying.
+  if (request.method === "GET") {
+    return new Response("Method Not Allowed", {
+      status: 405,
+      headers: { "Content-Type": "text/plain", Allow: "POST, OPTIONS" },
+    });
+  }
+
   const host = new URL(request.url).origin;
   const server = new McpServer({ name: "image-gen", version: "2.0.0" });
 
